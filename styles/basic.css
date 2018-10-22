@@ -1,0 +1,21 @@
+	body {
+		background-image: url("https://www.embeddedcomputers.net/images/bg.gif");
+		background-repeat: repeat;
+	}
+	
+	.ec_table {
+		width: 700px;
+		border:0px;
+		border-collapse:collapse;
+		border-spacing: 2px;
+		margin-left: auto; 
+		margin-right: auto;
+	}	
+	
+	.ec_body {
+		background-color: White;
+		border-left: 2px solid black;
+		border-right: 2px solid black;
+		border-top: 2px solid black;
+		border-bottom: 2px solid black;
+	}	
