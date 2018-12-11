@@ -1,27 +1,32 @@
-//Uses the j5.js example code for the particle effect
+//Uses the p5.js example code for the particle effect
 //Modified and additional code by rharris7@cocc.edu for CS-161
 
 var systems;
+var pail_img;
 
 function setup() {
   createCanvas(600, 400);   //Create frame
   systems = [];
+  pail_img = loadImage("./images/pail.png");  // Load the image
 }
-
+	
 function draw() {
-	background(0);
+	//background(255);
+	background('lightblue');
+	noStroke();
 	for (i = 0; i < systems.length; i++) {
 		systems[i].run();
 		systems[i].addParticle();
 	}
-    fill(255);
+    fill(0,0,128);
     textAlign(CENTER);
 	if (systems.length==0) {   //Nothing to show
 		textSize(32); 
-		text("Click Mouse to begin the show!", width/2, height/2);
+		text("Click Mouse to begin the app!", width/2, height/2);
 	} else {
-		textSize(16); 
-		text("Use the arrow keys to move the effect", width/2, 370);
+		image(pail_img, systems[0].origin.x-90, systems[0].origin.y-60);
+		textSize(16);
+		text("Use the arrow keys to move the pail", width/2, 20);
 	}
 }
 
