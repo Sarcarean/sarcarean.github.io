@@ -10,10 +10,12 @@ class Fraction:
     """A class that creates a fraction object"""
     def __init__(self, top, bottom):
         """The fraction class constructor"""
-        if not type(top) != type(int):
+        if not isinstance(top,int):
             raise Exception("Numerator is not an integer")
-        if not type(bottom) != type(int):
+        if not isinstance(bottom,int):
             raise Exception("Denominator is not an integer")
+        if bottom==0:
+            raise Exception("Denominator of zero is not valid")
         if bottom<0:
             bottom = bottom*-1
             top = abs(top)*-1
