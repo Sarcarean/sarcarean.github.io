@@ -6,6 +6,8 @@ def gcd(m,n):
         n = oldm%oldn
     return n
 
+
+
 class Fraction:
     """A class that creates a fraction object"""
     def __init__(self, top, bottom):
@@ -33,7 +35,7 @@ class Fraction:
 
     def __repr__(self):
         """The fraction class constructor"""
-        return self.__str__
+        return f"Fraction: {self.num}/{self.den}"
 
     def __add__(self, otherfraction):
         """Performs a fraction addition operation, returns a fraction"""
