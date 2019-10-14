@@ -1,130 +1,125 @@
 from Stack import Stack
 from Point import Point
+import os
+import time
 
+#Constants
+GO_ANYWHERE = -1
 GO_RIGHT = 0
 GO_LEFT = 1
 GO_UP = 2
 GO_DOWN = 3
 
 class Stack_Item(object):
-
+    """location items designed for a stack"""
     def __init__(self, location, direction):
         '''Defines location and direction'''
         self.location = location
         self.direction = direction
 
-    def getLocation():
+    def getLocation(self):
         return self.location
 
-    def getDirection():
+    def getDirection(self):
         return self.direction
 
-file = open("our_maze.txt", "r")
+file = open("our_maze_2.txt", "r")
 maze_ascii = file.read()
 maze_array = maze_ascii.split('\n')
 direction = GO_RIGHT
 
+def print_screen(player_pos):
+    """Prints the current maze with cursor"""
+    os.system('cls')
+    for y in range(len(maze_array)):
+        line = maze_array[y]
+        if player_pos.getY()==y:
+            line_length = len(line)
+            x = player_pos.getX()
+            before = ""
+            after = ""
+            if (x>0):
+                before = line[0:x]
+            if (x<line_length):
+                after = line[x+1:(x+1)+(line_length-x)]          
+            print(before + "@" + after)
+        else:
+            print(line)
+    time.sleep(0.1)
+
 def get_outs(dir, x, y):
-    exits = []
-    if dir==GO_RIGHT:
-      if y<len(maze_array):
-          if maze_array[y+1][x]=="0":   #Check Down square
-              p = Point(x,y+1)
-              exits.append(p)
-      if x<len(maze_array[y]):
-          if maze_array[y][x+1]=="0":    #Check right square
+    """uses cordinates to figure out where the cursor can move"""
+    exits = []     
+    if (dir!=GO_LEFT):                          
+      if( x<len(maze_array[y])):
+          if maze_array[y][x+1]=="0" or maze_array[y][x+1]=="X":    #Check right square
               p = Point(x+1,y)
               exits.append(p)
-      if y>0:
-          if maze_array[y-1][x]=="0":    #Check Up square
-              p = Point(x,y-1)
+    if (dir!=GO_RIGHT) :
+      if (x>0):
+          if maze_array[y][x-1]=="0" or maze_array[y][x-1]=="X":   #Check left square
+              p = Point(x-1,y)
               exits.append(p)
-    elif dir==GO_LEFT:
-      if y<len(maze_array):
-          if maze_array[y+1][x]=="0":   #Check Down square
+    if (dir!=GO_DOWN) :
+      if (y>0):
+          if maze_array[y-1][x]=="0" or maze_array[y-1][x]=="X":    #Check up square
+              p = Point(x, y-1)
+              exits.append(p)
+    if (dir!=GO_UP)   :
+      if (y<len(maze_array)):
+          if maze_array[y+1][x]=="0" or maze_array[y+1][x]=="X":    #Check down square
               p = Point(x,y+1)
               exits.append(p)
-      if x>0:
-          if maze_array[y][x-1]=="0":    #Check left square
-              p = Point(x-1,y)
-              exits.append(p)
-      if y>0:
-          if maze_array[y-1][x]=="0":    #Check Up square
-              p = Point(x,y-1)
-              exits.append(p)
-    elif dir==GO_UP:
-      if x>0:
-          if maze_array[y][x-1]=="0":   #Check left square
-              p = Point(x-1,y)
-              exits.append(p)
-      if y>0:
-          if maze_array[y-1][x]=="0":    #Check up square
-              p = Point(y-1, x)
-              exits.append(p)
-      if x<len(maze_array[y]):
-          if maze_array[y][x+1]=="0":    #Check right square
-              p = Point(x+1,y)
-              exits.append(p)
-    elif dir==GO_DOWN:
-      if x>0:
-          if maze_array[y][x-1]=="0":   #Check left square
-              p = Point(x-1,y)
-              exits.append(p)
-      if y<len(maze_array):
-          if maze_array[y+1][x]=="0":    #Check down square
-              p = Point(x,y+1)
-              exits.append(p)
-      if x<len(maze_array[y]):
-          if maze_array[y][x+1]=="0":    #Check right square
-              p = Point(x+1,y)
-              exits.append(p)
+
     return exits
 
 def get_direction(current, destination):
-   if destination.getX()==curent.getX():
+   """Compares to locations and returns the direction between them"""
+   if destination.getX()==current.getX():
       if destination.getY()>current.getY():
-         return GO_UP
-      else:
          return GO_DOWN
-   if destination.getX()<current.getX():
-      return GO_LEFT
-   else:
+      else:
+         return GO_UP
+   if destination.getX()>current.getX():
       return GO_RIGHT
+   else:
+      return GO_LEFT
 
-def StartMaze():
-    loc= Point(0,1)  
+def StartMaze(location):
+    """Main routine to solve a ascii maze"""
     lost = True
     options = Stack()
-    direction=GO_RIGHT
-
-    while lost:
-        if direction==GO_RIGHT:
-           loc=Point(loc.getX()+1,loc.getY())
+    direction = -1
+    while lost: 
+        if direction==GO_RIGHT:                                    #Moves the cursor (if direction is assigned)
+           location=Point(location.getX()+1,location.getY())
         elif direction==GO_LEFT:
-           loc=Point(loc.getX()-1,loc.getY())
+           location=Point(location.getX()-1,location.getY())
         elif direction==GO_UP:
-            loc=Point(loc.getX(),loc.getY()-1)
+            location=Point(location.getX(),location.getY()-1)
         elif direction==GO_DOWN:
-            loc=Point(loc.getX(),loc.getY()+1)
-
-        if maze_array[loc.getY()][loc.getX()] == "X":
+            location=Point(location.getX(),location.getY()+1)
+        print_screen(location);                                     #Draws the current screen
+        if maze_array[location.getY()][location.getX()] == "X":     #Look at current location to see if we found the exit
             lost = False
+            print("You found the exit!")
         else:
-            exits=get_outs(direction,loc.getX(), loc.getY())
+            exits=get_outs(direction,location.getX(), location.getY())  #Gets all of the locations we can move to next
             if len(exits)==0:
-                #Error check to see if stack is empty, return error, no way out
-                new_direction_item = stack.pop()
-                loc = new_direction_item.getLocation()
+                if options.size()==0:   #This is a error if the maze can not be solved
+                    raise ValueError("I dreamt of a nightmarish cafe, underground, with no way out")
+                new_direction_item = options.pop()
+                location = new_direction_item.getLocation()
                 direction = new_direction_item.getDirection()
+                print_screen(location);
             elif len(exits)==1:
-                get_direction(loc,exits(0))
-                loc = exits(0)
+                direction = get_direction(location, exits[0])
             else:
-                options.push(Stack_Item(exits(1),get_direction(loc,exits(1))))
-                if exists.size()==2:
-                    options.push(Stack_Item(exits(2),get_direction(loc,exits(2))))
-                direction = get_direction(loc,exits(0))
+                options.push(Stack_Item(exits[1],get_direction(location,exits[1])))
+                if len(exits)==3:
+                    options.push(Stack_Item(exits[2],get_direction(location,exits[2])))
+                direction = get_direction(location,exits[0])
 
 
 if __name__=="__main__":
-    StartMaze()
+    StartMaze(Point(0,1))       #Pass location of where to start in the maze
