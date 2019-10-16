@@ -85,23 +85,27 @@ def get_direction(current, destination):
    else:
       return GO_LEFT
 
+def move_cursor(direction, location):
+    if direction==GO_RIGHT:                                    
+        location=Point(location.getX()+1,location.getY())
+    elif direction==GO_LEFT:
+        location=Point(location.getX()-1,location.getY())
+    elif direction==GO_UP:
+        location=Point(location.getX(),location.getY()-1)
+    elif direction==GO_DOWN:
+        location=Point(location.getX(),location.getY()+1)
+    return location
+
 def StartMaze(location):
     """Main routine to solve a ascii maze"""
     lost = True
     options = Stack()
     direction = -1
     while lost: 
-        if direction==GO_RIGHT:                                    #Moves the cursor (if direction is assigned)
-           location=Point(location.getX()+1,location.getY())
-        elif direction==GO_LEFT:
-           location=Point(location.getX()-1,location.getY())
-        elif direction==GO_UP:
-            location=Point(location.getX(),location.getY()-1)
-        elif direction==GO_DOWN:
-            location=Point(location.getX(),location.getY()+1)
+        location = move_cursor(direction, location)                 #Moves the cursor (if direction is assigned)
         print_screen(location);                                     #Draws the current screen
         if maze_array[location.getY()][location.getX()] == "X":     #Look at current location to see if we found the exit
-            lost = False
+            lost = False                                            #We are no longer lost
             print("You found the exit!")
         else:
             exits=get_outs(direction,location.getX(), location.getY())  #Gets all of the locations we can move to next
