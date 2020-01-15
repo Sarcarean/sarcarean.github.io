@@ -1,31 +1,131 @@
-import random
-import string
-import collections
+import sys
+import os
 
-def hasher(product_id, table_size):
-    output = 0xFFFF
-    for i in range(0, len(product_id)):
-        output ^= ord(product_id[i]) << 8
-        for j in range(0,8):
-            if (output & 0x8000) > 0:
-                output =(output << 1) ^ 0x1021
-            else:
-                output = output << 1
-    return (output & 0xFFFF)%table_size
+class Graph:
+    def __init__(self):
+        self.vertices = {}
+        self.numVertices = 0
+        
+    def addVertex(self,key):
+        self.numVertices = self.numVertices + 1
+        newVertex = Vertex(key)
+        self.vertices[key] = newVertex
+        return newVertex
+    
+    def getVertex(self,n):
+        if n in self.vertices:
+            return self.vertices[n]
+        else:
+            return None
 
-if __name__=="__main__":
-    letters = string.ascii_uppercase
-    table = []
-    for x in range(1000):
-        s = str(random.randint(0,9)) + random.choice(letters) + random.choice(letters) 
-        s = s + str(random.randint(0,9)) + str(random.randint(0,9)) + random.choice(letters)
-        hash_key = hasher(s, 1000)
-        table.append(hash_key)
-    table.sort()
-    counted=collections.Counter(table)
-    collisions=1000-len(counted.keys())
-    print("Total collisions: " + str(collisions))
+    def __contains__(self,n):
+        return n in self.vertices
+    
+    def addEdge(self,f,t,cost=0):
+            if f not in self.vertices:
+                nv = self.addVertex(f)
+            if t not in self.vertices:
+                nv = self.addVertex(t)
+            self.vertices[f].addNeighbor(self.vertices[t],cost)
+    
+    def getVertices(self):
+        return list(self.vertices.keys())
+        
+    def __iter__(self):
+        return iter(self.vertices.values())
+                
+class Vertex:
+    def __init__(self,num):
+        self.id = num
+        self.connectedTo = {}
+        self.color = 'white'
+        self.dist = sys.maxsize
+        self.pred = None
+        self.disc = 0
+        self.fin = 0
+
+    # def __lt__(self,o):
+    #     return self.id < o.id
+    
+    def addNeighbor(self,nbr,weight=0):
+        self.connectedTo[nbr] = weight
+        
+    def setColor(self,color):
+        self.color = color
+        
+    def setDistance(self,d):
+        self.dist = d
+
+    def setPred(self,p):
+        self.pred = p
+
+    def setDiscovery(self,dtime):
+        self.disc = dtime
+        
+    def setFinish(self,ftime):
+        self.fin = ftime
+        
+    def getFinish(self):
+        return self.fin
+        
+    def getDiscovery(self):
+        return self.disc
+        
+    def getPred(self):
+        return self.pred
+        
+    def getDistance(self):
+        return self.dist
+        
+    def getColor(self):
+        return self.color
+    
+    def getConnections(self):
+        return self.connectedTo.keys()
+        
+    def getWeight(self,nbr):
+        return self.connectedTo[nbr]
+                
+    def __str__(self):
+        return str(self.id) + ":color " + self.color + ":disc " + str(self.disc) + ":fin " + str(self.fin) + ":dist " + str(self.dist) + ":pred \n\t[" + str(self.pred)+ "]\n"
+    
+    def getId(self):
+        return self.id
+
+
+class DFSGraph(Graph):
+    def __init__(self):
+        super().__init__()
+        self.time = 0
+
+    def dfs(self):
+        for aVertex in self:
+            aVertex.setColor('white')
+            aVertex.setPred(-1)
+        for aVertex in self:
+            if aVertex.getColor() == 'white':
+                self.dfsvisit(aVertex)
+
+    def dfsvisit(self,startVertex):
+        startVertex.setColor('gray')
+        self.time += 1
+        startVertex.setDiscovery(self.time)
+        for nextVertex in startVertex.getConnections():
+            if nextVertex.getColor() == 'white':
+                nextVertex.setPred(startVertex)
+                self.dfsvisit(nextVertex)
+        startVertex.setColor('black')
+        self.time += 1
+        startVertex.setFinish(self.time)
 
 
 
-
+g = DFSGraph() 
+g.addEdge(0, 1) 
+g.addEdge(0, 2) 
+g.addEdge(1, 2) 
+g.addEdge(2, 0) 
+g.addEdge(2, 3) 
+g.addEdge(3, 3)
+g.dfs()
+print("111")
